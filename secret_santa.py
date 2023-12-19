@@ -3,6 +3,8 @@ import pandas as pd
 import random as rd
 import re
 
+max_history_length = 5
+
 filename = "secret_santa.csv"
 if os.path.exists(filename):
 	history_df = pd.read_csv(filename)
@@ -29,10 +31,10 @@ while attempts < max_attempts and len(current) < len(guests):
 	for guest in guests:
 
 		print(f"guest: {guest}")
-		print(f"history_dict: {set(history_dict[guest])}")
+		print(f"history_dict: {set(history_dict[guest][-max_history_length:])}")
 		print(f"chosen: {set(chosen)}")
 
-		options = set(guests) - {guest} - set(history_dict[guest]) - set(chosen)
+		options = set(guests) - {guest} - set(history_dict[guest][-max_history_length:]) - set(chosen)
 
 		if len(options) > 0:
 			print(f"options: {options}")
@@ -48,7 +50,7 @@ while attempts < max_attempts and len(current) < len(guests):
 	attempts += 1
 
 assert len(chosen) == len(guests), "Unable to find secret santa choices for everyone"
-print(f"\nTook {attempts+1} tries.\n")
+print(f"\nTook {attempts} tries.\n")
 
 for guest, option in current.items():
 	history_dict[guest].append(option)
