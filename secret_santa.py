@@ -1,6 +1,7 @@
-import random as rd
-import pandas as pd
 import os
+import pandas as pd
+import random as rd
+import re
 
 filename = "secret_santa.csv"
 if os.path.exists(filename):
@@ -12,18 +13,44 @@ else:
 	history_dict = {guest:[] for guest in guests}
 	history_df = pd.DataFrame(history_dict)
 
+# for each guest
+# get list of valid options which is full guest list minus: 
+#	- past choices
+#   - the guest's self
+#	- guests already chosen
+
+chosen = []
 current = {}
 max_attempts = 0
 for guest in guests:
-	attempts = 0
-	while attempts < 100:
-		history = history_dict[guest]
-		option = rd.choice(guests)
 
-		if option != guest and option not in history:
-			current[guest] = option
-			break
-		attempts += 1
+	print(f"guest: {guest}")
+	print(f"history_dict: {set(history_dict[guest])}")
+	print(f"chosen: {set(chosen)}")
+
+	options = set(guests) - {guest} - set(history_dict[guest]) - set(chosen)
+
+	print(f"options: {options}")
+	
+
+	assert len(options) > 0, f"No secrete santa options found for: {guest}"
+
+	option = rd.choice(list(options))
+	current[guest] = option
+	chosen.append(option)
+
+	print(f"option: {option}")
+	print("\n" + "_"*50 + "\n")
+
+	# attempts = 0
+	# while attempts < 100:
+	# 	history = history_dict[guest]
+	# 	option = rd.choice(guests)
+
+	# 	if option != guest and option not in history:
+	# 		current[guest] = option
+	# 		break
+	# 	attempts += 1
 
 for guest, option in current.items():
 	history_dict[guest].append(option)
@@ -36,6 +63,6 @@ for guest, option in current.items():
 	history_dict[guest].append(option)
 
 print("\nPast Seceret Santas!")
-print(history_df.to_string(index=False))
+print(history_df.to_string())
 
 history_df.to_csv("secret_santa.csv", index=False)
