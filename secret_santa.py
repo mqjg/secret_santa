@@ -19,38 +19,36 @@ else:
 #   - the guest's self
 #	- guests already chosen
 
-chosen = []
+max_attempts = 10000
+attempts = 0
 current = {}
-max_attempts = 0
-for guest in guests:
+while attempts < max_attempts and len(current) < len(guests):
+	print("\n" + f"Attempt {attempts}" + "_"*50 + "\n")
+	chosen = []
+	current = {}
+	for guest in guests:
 
-	print(f"guest: {guest}")
-	print(f"history_dict: {set(history_dict[guest])}")
-	print(f"chosen: {set(chosen)}")
+		print(f"guest: {guest}")
+		print(f"history_dict: {set(history_dict[guest])}")
+		print(f"chosen: {set(chosen)}")
 
-	options = set(guests) - {guest} - set(history_dict[guest]) - set(chosen)
+		options = set(guests) - {guest} - set(history_dict[guest]) - set(chosen)
 
-	print(f"options: {options}")
-	
+		if len(options) > 0:
+			print(f"options: {options}")
+			option = rd.choice(list(options))
+			current[guest] = option
+			chosen.append(option)
+		else:
+			break
 
-	assert len(options) > 0, f"No secrete santa options found for: {guest}"
+		print(f"option: {option}")
+		print("\n" + "_"*50 + "\n")
 
-	option = rd.choice(list(options))
-	current[guest] = option
-	chosen.append(option)
+	attempts += 1
 
-	print(f"option: {option}")
-	print("\n" + "_"*50 + "\n")
-
-	# attempts = 0
-	# while attempts < 100:
-	# 	history = history_dict[guest]
-	# 	option = rd.choice(guests)
-
-	# 	if option != guest and option not in history:
-	# 		current[guest] = option
-	# 		break
-	# 	attempts += 1
+assert len(chosen) == len(guests), "Unable to find secret santa choices for everyone"
+print(f"\nTook {attempts+1} tries.\n")
 
 for guest, option in current.items():
 	history_dict[guest].append(option)
